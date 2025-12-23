@@ -1,0 +1,45 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: docker-java-demo
+  namespace: default
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      service: server
+  template:
+    metadata:
+      labels:
+        service: server
+    spec:
+      containers:
+        - name: server-service
+          image: rayanebendaouch/tpdocker:latest
+          imagePullPolicy: Always
+          env:
+           - name: POSTGRES_HOST
+             value: postgres
+           - name: POSTGRES_PORT
+             value: "5432"
+           - name: POSTGRES_DB
+             value: petclinic
+           - name: POSTGRES_USER
+             value: petclinic
+           - name: POSTGRES_PASS
+             value: petclinic
+        
+---
+apiVersion: v1
+kind: Service
+metadata:
+  name: service-entrypoint
+  namespace: default
+spec:
+  type: NodePort
+  selector:
+    service: server
+  ports:
+    - port: 8081
+      targetPort: 8081
+      nodePort: 30001
